@@ -1,4 +1,4 @@
-requireTraver
+requireTraverser
 =============
 
 A library for finding all the nested dependencies of a commonJS/node.js module. Uses 'detective' to traverse files.

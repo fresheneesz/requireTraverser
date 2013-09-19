@@ -36,9 +36,12 @@ module.exports = function() {
             return resolveDependencyFileName(dependency.dir, dependency.module, opts)
         })
 
-        Future.all(modulesToTraverse).then(function(modules) {
-			var dependencyMap = {}
-			traverse(modules, dependencyMap, opts)	
+        Future.all(modulesToTraverse).then(function(module) {
+			if(module === undefined)
+                throw Error("Couldn't find module: "+module)
+
+            var dependencyMap = {}
+			traverse(module, dependencyMap, opts)
 			errback(undefined, dependencyMap)
 		}).catch(errback)
     }catch(e) {
@@ -63,13 +66,18 @@ var traverse = function(dependencies, dependencyMap, opts) {
             var futures = []
             detectiveWork.strings.forEach(function(subdependency) {
                 futures.push(resolveDependencyFileName(fileDirectory, subdependency, opts).then(function(file) {
-					Future.wrap(fs, 'exists')(file).then(function(exists) {
-						if(exists) {
-		                    subdependencies.push({relative: subdependency, absolute: file})
-		                } else {
-		                    unfoundSubDependencies.push(subdependency)
-		                }	
-					})
+					if(file === undefined)
+                        var exists = Future(false)
+                    else
+                        var exists = Future.wrap(fs, 'exists')(file)
+
+                    exists.then(function(exists) {
+                        if(exists) {
+                            subdependencies.push({relative: subdependency, absolute: file})
+                        } else {
+                            unfoundSubDependencies.push(subdependency)
+                        }
+                    })
 				}))
             })
 
@@ -88,11 +96,12 @@ var traverse = function(dependencies, dependencyMap, opts) {
     })
 }
 
+// returns Future(<filename>) or Future(undefined)
 function resolveDependencyFileName(directory, dependency, opts) {
 	opts.basedir = directory
     return Future.wrap(resolve)(dependency, opts).catch(function(e) {
 		if(e.message.indexOf("Cannot find module") === 0) {
-            return null
+            return Future(undefined)
         } else {
             throw e // unknown error
         }

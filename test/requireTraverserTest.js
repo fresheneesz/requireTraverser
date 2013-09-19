@@ -41,7 +41,6 @@ var test = Unit.test("Testing requireTraverser", function() {
 
     function isFile(filepath, errback) {
 		var analyzeThisPath = path.resolve('testFiles/inner/analyzeThis.js')
-		console.log("OMG: "+(filepath === analyzeThisPath))
         if(filepath === analyzeThisPath) {
             return errback(undefined, true)
         } else {
@@ -50,7 +49,6 @@ var test = Unit.test("Testing requireTraverser", function() {
     }
 
     function readFile(filepath, errback) {
-        console.log("OMG2: "+filepath)
 		if(module === 'test') {
             return "var x = 5"
         } else {
@@ -79,8 +77,6 @@ var test = Unit.test("Testing requireTraverser", function() {
         var d = r('inner/node_modules/d.js')
         var moose = r('inner/node_modules/moose.js')
         var curl = r('../../../node_modules/curl/src/curl.js')
-
-        console.log('\n'+r('../../node_modules/curl/src/curl.js')+'\n')
 
         function basicTest(filePath, resolved, unresolved, unfound) {
             var info = files[filePath]
@@ -149,13 +145,7 @@ var test = Unit.test("Testing requireTraverser", function() {
 
 })
 
-console.log("FUTURES: "+futures)
-console.log("io: "+(futures[0] instanceof Future))
-futures[0].then(function() {
-	console.log("WUT2")
-})
 Future.all(futures).then(function() {
-	console.log("WUT")
 	test.writeConsole()	
 })
 
