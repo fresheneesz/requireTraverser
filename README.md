@@ -7,7 +7,7 @@ Install
 =======
 
 ```
-npm install requireTraverser
+npm install require-traverser
 ```
 
 Usage
