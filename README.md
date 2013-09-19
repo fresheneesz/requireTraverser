@@ -13,7 +13,7 @@ npm install require-traverser
 Usage
 =====
 ```
-var rt = require('requireTraverser')
+var rt = require('require-traverser')
 ```
 
 Two ways to call `rt`:
