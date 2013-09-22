@@ -23,11 +23,11 @@ Two ways to call `rt`:
 
 where
 	
-* <directory> is the directory path from which to search for the module
-* <module> is the module to get dependencies from
-* <moduleList> is an array of objects like: {dir: <directory>, module: <module>}
-* <errback> is a standard node.js errback
-* <opts> is optional, and can have any of the parameters:
+* `<directory>` is the directory path from which to search for the module
+* `<module>` is the module to get dependencies from
+* `<moduleList>` is an array of objects like: {dir: <directory>, module: <module>}
+* `<errback>` is a standard node.js errback
+* `<opts>` is optional, and can have any of the parameters:
     * isFile - function to asynchronously test whether a file exists. Takes the same parameters as fs.isFile.
     * readFile - function to read files asynchronously. Takes the same parameters as fs.readFile.
 

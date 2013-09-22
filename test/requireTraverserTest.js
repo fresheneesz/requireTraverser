@@ -3,34 +3,36 @@
 var path = require("path")
 var Unit = require('deadunit')
 var Future = require('asyncFuture')
+Future.debug = true
 
 var futures = []
 var test = Unit.test("Testing requireTraverser", function() {
     var tr = require('../requireTraverser')
-    var t = this
 
     this.test("one module", function() {
-        t = this
+        var t = this
         var f = new Future
         futures.push(f)
 		tr(__dirname, './testFiles/inner/analyzeThis.js', function(e,files) {
-			testCallback(e,files)
+			console.dir(files)
+			console.dir(e)
+			testCallback(t, e,files)
 			f.return()
 		});
     })
     this.test("multiple module", function() {
-        t = this
+        var t = this
         var f = new Future
         futures.push(f)
         tr([{dir:__dirname, module:'./testFiles/inner/analyzeThis.js'},
             {dir:__dirname, module:'./testFiles/node_modules/doom.js'}
             ], function(e,files) {
-				testCallback(e,files)
+				testCallback(t, e,files)
 				f.return()
 		});
     })
     this.test("one module with options", function() {
-        t = this
+        var t = this
         var f = new Future
         futures.push(f)
         tr(__dirname, './testFiles/inner/analyzeThis.js', {isFile: isFile, readFile: readFile}, function(e, files) {
@@ -56,7 +58,7 @@ var test = Unit.test("Testing requireTraverser", function() {
         }
     }
 
-    function testCallback(e, files) {
+    function testCallback(t, e, files) {
         if(e) throw e
 
         var r = resolveRelativePath
@@ -82,7 +84,7 @@ var test = Unit.test("Testing requireTraverser", function() {
             var info = files[filePath]
             this.ok(info)
 
-            this.ok(info.resolved.length === resolved)
+            this.ok(info.resolved.length === resolved, info.resolved.length)
             this.ok(info.unresolved.length === unresolved)
             this.ok(info.unfound.length === unfound)
 
@@ -93,16 +95,27 @@ var test = Unit.test("Testing requireTraverser", function() {
             var info = basicTest.call(this, analyzeThis, 5, 2, 3)
             var resolved = info.resolved
 
-            this.ok(resolved[0].relative === './dependencyA')
-            this.ok(resolved[0].absolute === dependencyA)
-            this.ok(resolved[1].relative === 'c')
-            this.ok(resolved[1].absolute === c)
-            this.ok(resolved[2].relative === 'doom')
-            this.ok(resolved[2].absolute === doom)
-            this.ok(resolved[3].relative === 'moose')
-            this.ok(resolved[3].absolute === moose)
-            this.ok(resolved[4].relative === 'a')
-            this.ok(resolved[4].absolute === a)
+            var moduleToIndex = {} // maps from module  name to its index in the array 'resolved'
+            resolved.forEach(function(v, n) {
+                moduleToIndex[v.relative] = n
+            })
+
+            // check if each dependency exists, and has the right absolute path
+            var dep = './dependencyA'
+            this.ok(dep in moduleToIndex)
+            this.ok(resolved[moduleToIndex[dep]].absolute === dependencyA)
+            dep = 'c'
+            this.ok(dep in moduleToIndex)
+            this.ok(resolved[moduleToIndex[dep]].absolute === c)
+            dep = 'moose'
+            this.ok(dep in moduleToIndex)
+            this.ok(resolved[moduleToIndex[dep]].absolute === moose)
+            dep = 'doom'
+            this.ok(dep in moduleToIndex)
+            this.ok(resolved[moduleToIndex[dep]].absolute === doom)
+            dep = 'a'
+            this.ok(dep in moduleToIndex)
+            this.ok(resolved[moduleToIndex[dep]].absolute === a)
 
             this.ok(info.unresolved[0] === "'dep' + 'endency'")
             this.ok(info.unresolved[1] === 'x')
@@ -110,6 +123,7 @@ var test = Unit.test("Testing requireTraverser", function() {
             this.ok(info.unfound[0] === 'util')
             this.ok(info.unfound[1] === 'fs')
             this.ok(info.unfound[2] === 'curl')
+
         })
 
         t.test("dependencyA.js", function() {
@@ -138,9 +152,6 @@ var test = Unit.test("Testing requireTraverser", function() {
             this.ok(info.resolved[0].relative === 'c')
             this.ok(info.resolved[0].absolute === c)
         })
-
-        console.dir(files)
-
     }
 
 })

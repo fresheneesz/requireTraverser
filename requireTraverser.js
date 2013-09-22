@@ -41,9 +41,12 @@ module.exports = function() {
                 throw Error("Couldn't find module: "+module)
 
             var dependencyMap = {}
-			traverse(module, dependencyMap, opts)
-			errback(undefined, dependencyMap)
-		}).catch(errback)
+			return traverse(module, dependencyMap, opts)
+
+		}).then(function(dependencyMap) {
+            errback(undefined, dependencyMap)
+
+        }).catch(errback).done()
     }catch(e) {
         errback(e)
     }
@@ -53,8 +56,10 @@ module.exports = function() {
     // an array of objects like: {dir: <base directory>, module: <module>}, and
     // a cache of the already-parsed file paths
 // mutates dependencyMap, adding more dependencies
+// returns a future
 var traverse = function(dependencies, dependencyMap, opts) {
-    dependencies.forEach(function(dependencyFile) {
+    var mainFutures = []
+	dependencies.forEach(function(dependencyFile) {
         if(dependencyMap[dependencyFile] === undefined) { // only traverse a file if it hasn't already been traversed
             var filePath = path.resolve(dependencyFile)
             var fileDirectory = path.dirname(filePath)
@@ -68,10 +73,14 @@ var traverse = function(dependencies, dependencyMap, opts) {
                 futures.push(resolveDependencyFileName(fileDirectory, subdependency, opts).then(function(file) {
 					if(file === undefined)
                         var exists = Future(false)
-                    else
-                        var exists = Future.wrap(fs, 'exists')(file)
+                    else {
+                        var exists = new Future
+                        fs.exists(file, function(result) {
+							exists.return(result)
+						})
+					}
 
-                    exists.then(function(exists) {
+                    return exists.then(function(exists) {
                         if(exists) {
                             subdependencies.push({relative: subdependency, absolute: file})
                         } else {
@@ -81,7 +90,7 @@ var traverse = function(dependencies, dependencyMap, opts) {
 				}))
             })
 
-			Future.all(futures).then(function() {
+			mainFutures.push(Future.all(futures).then(function() {
 	            dependencyMap[dependencyFile] = {   resolved: subdependencies,
 	                                                unresolved: detectiveWork.expressions,
 	                                                unfound: unfoundSubDependencies}
@@ -90,21 +99,28 @@ var traverse = function(dependencies, dependencyMap, opts) {
 	                return subdependency.absolute
 	            })
 	
-	            traverse(newDependencies, dependencyMap, opts)	            
-			})
+	            return traverse(newDependencies, dependencyMap, opts)
+			}))
         }
     })
+    
+    var result = Future.all(mainFutures).then(function() {
+        return Future(dependencyMap)
+    })
+
+    return result
 }
 
 // returns Future(<filename>) or Future(undefined)
 function resolveDependencyFileName(directory, dependency, opts) {
 	opts.basedir = directory
-    return Future.wrap(resolve)(dependency, opts).catch(function(e) {
-		if(e.message.indexOf("Cannot find module") === 0) {
-            return Future(undefined)
-        } else {
-            throw e // unknown error
-        }
-	})
+    return Future.wrap(resolve)(dependency, opts)
+				.catch(function(e) {
+					if(e.message.indexOf("Cannot find module") === 0) {
+			            return Future(undefined)
+			        } else {
+						throw e // unknown error
+			        }
+				})
 
 }
