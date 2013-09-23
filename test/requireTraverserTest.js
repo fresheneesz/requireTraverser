@@ -2,7 +2,7 @@
 
 var path = require("path")
 var Unit = require('deadunit')
-var Future = require('asyncFuture')
+var Future = require('async-future')
 Future.debug = true
 
 var futures = []

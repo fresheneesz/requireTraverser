@@ -42,3 +42,7 @@ where
 ```
 
 `rt` doesn't resolve node.js native libraries (returns them as 'unfound').
+
+License
+=======
+Released under the MIT license: http://opensource.org/licenses/MIT

@@ -6,7 +6,7 @@
 
 var fs = require('fs')
 var path = require('path')
-var Future = require('asyncFuture')
+var Future = require('async-future')
 
 var resolve = require('resolve')
 var detective = require('detective')
