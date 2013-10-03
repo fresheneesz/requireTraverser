@@ -1,8 +1,5 @@
-/* Copyright (c) 2013 Billy Tetrud - Free to use for any purpose: MIT License*/
+/* Copyright (c) 2013 Billy Tetrud - Free to use for any purpose: MIT License */
 'use strict';
-
-// todo:
-// * implement true asynchronous version
 
 var fs = require('fs')
 var path = require('path')
