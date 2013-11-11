@@ -33,12 +33,19 @@ module.exports = function() {
             return resolveDependencyFileName(dependency.dir, dependency.module, opts)
         })
 
-        Future.all(modulesToTraverse).then(function(module) {
-			if(module === undefined)
-                throw Error("Couldn't find module: "+module)
+        Future.all(modulesToTraverse).then(function(modules) {
+            var undefinedModules = []
+            modules.forEach(function(module, n) {
+                if(module === undefined)
+                    undefinedModules.push(dependencies[n].module)
+            })
+
+            if(undefinedModules.length > 0)
+                throw Error("Can't find modules: "+undefinedModules)
+
 
             var dependencyMap = {}
-			return traverse(module, dependencyMap, opts)
+            return traverse(modules, dependencyMap, opts)
 
 		}).then(function(dependencyMap) {
             errback(undefined, dependencyMap)

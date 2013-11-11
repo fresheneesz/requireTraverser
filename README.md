@@ -28,7 +28,7 @@ where
 * `<directory>` is the directory path from which to search for the module
 * `<module>` is the module to get dependencies from
 * `<moduleList>` is an array of objects like: {dir: <directory>, module: <module>}
-* `<errback>` is a standard node.js errback
+* `<errback>` is a standard node.js errback (where the first parameter is the error, undefined if there was none, and the second parameter is the return value)
 * `<opts>` is optional, and can have any of the parameters:
     * isFile - function to asynchronously test whether a file exists. Takes the same parameters as fs.isFile.
     * readFile - function to read files asynchronously. Takes the same parameters as fs.readFile.
@@ -65,6 +65,11 @@ How to submit pull requests:
 7. When you're done, run the unit tests and ensure they all pass
 8. Commit and push your changes
 9. Submit a pull request: https://help.github.com/articles/creating-a-pull-request
+
+Change Log
+==========
+
+* 0.1.6 - fixed a bug in error handling when initial modules can't be found
 
 License
 =======

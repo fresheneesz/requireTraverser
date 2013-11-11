@@ -9,13 +9,23 @@ var futures = []
 var test = Unit.test("Testing requireTraverser", function() {
     var tr = require('../requireTraverser')
 
+    this.test("unfound dependency", function() {
+        var t = this
+        var f = new Future
+        //futures.push(f)
+		tr(__dirname, 'nonexistant', function(e,files) {
+			f.return()
+            t.ok(e.message === "Can't find modules: nonexistant", e.message)
+		});
+    })
+
     this.test("one module", function() {
         var t = this
         var f = new Future
         futures.push(f)
 		tr(__dirname, './testFiles/inner/analyzeThis.js', function(e,files) {
-			console.dir(files)
-			console.dir(e)
+			//console.dir(files)
+			//console.dir(e)
 			testCallback(t, e,files)
 			f.return()
 		});
