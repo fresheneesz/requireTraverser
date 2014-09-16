@@ -24,7 +24,7 @@ var test = Unit.test("Testing requireTraverser", function() {
         var f = new Future
         futures.push(f)
 		tr(__dirname, './testFiles/inner/analyzeThis.js', function(e,files) {
-			//console.dir(files)
+			//console.dir(files, 10)
 			//console.dir(e)
 			testCallback(t, e,files)
 			f.return()
@@ -79,7 +79,7 @@ var test = Unit.test("Testing requireTraverser", function() {
             keys.push(n)
         }
 
-        t.ok(keys.length === 7)
+        t.ok(keys.length === 11, keys.length)
 
         var analyzeThis = r('inner/analyzeThis.js')
         var dependencyA = r('inner/dependencyA.js')
@@ -89,6 +89,10 @@ var test = Unit.test("Testing requireTraverser", function() {
         var d = r('inner/node_modules/d.js')
         var moose = r('inner/node_modules/moose.js')
         var curl = r('../../../node_modules/curl/src/curl.js')
+        var withIndex = r('node_modules/withIndex/index.js')
+        var withPackageJson = r('node_modules/withPackageJson/main.js')
+        var withIndex2 = r('inner/withIndex2/index.js')
+        var withPackageJson2 = r('inner/withPackageJson2/main.js')
 
         function basicTest(filePath, resolved, unresolved, unfound) {
             var info = files[filePath]
@@ -102,7 +106,7 @@ var test = Unit.test("Testing requireTraverser", function() {
         }
 
         t.test("analyzeThis.js", function() {
-            var info = basicTest.call(this, analyzeThis, 5, 2, 3)
+            var info = basicTest.call(this, analyzeThis, 9, 2, 3)
             var resolved = info.resolved
 
             var moduleToIndex = {} // maps from module  name to its index in the array 'resolved'
@@ -126,6 +130,18 @@ var test = Unit.test("Testing requireTraverser", function() {
             dep = 'a'
             this.ok(dep in moduleToIndex)
             this.ok(resolved[moduleToIndex[dep]].absolute === a)
+            dep = 'withIndex'
+            this.ok(dep in moduleToIndex)
+            this.ok(resolved[moduleToIndex[dep]].absolute === withIndex)
+            dep = 'withPackageJson'
+            this.ok(dep in moduleToIndex)
+            this.ok(resolved[moduleToIndex[dep]].absolute === withPackageJson)
+            dep = './withIndex2/'
+            this.ok(dep in moduleToIndex)
+            this.ok(resolved[moduleToIndex[dep]].absolute === withIndex2, resolved[moduleToIndex[dep]].absolute)
+            dep = './withPackageJson2/'
+            this.ok(dep in moduleToIndex)
+            this.ok(resolved[moduleToIndex[dep]].absolute === withPackageJson2)
 
             this.ok(info.unresolved[0] === "'dep' + 'endency'")
             this.ok(info.unresolved[1] === 'x')
@@ -161,6 +177,20 @@ var test = Unit.test("Testing requireTraverser", function() {
 
             this.ok(info.resolved[0].relative === 'c')
             this.ok(info.resolved[0].absolute === c)
+        })
+
+        t.test("withIndex", function() {
+            var info = basicTest.call(this, withIndex, 0, 0, 0)
+        })
+        t.test("withPackageJson", function() {
+            var info = basicTest.call(this, withPackageJson, 0, 0, 0)
+        })
+
+        t.test("withIndex2", function() {
+            var info = basicTest.call(this, withIndex2, 0, 0, 0)
+        })
+        t.test("withPackageJson2", function() {
+            var info = basicTest.call(this, withPackageJson2, 0, 0, 0)
         })
     }
 

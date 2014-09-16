@@ -1,11 +1,11 @@
 {"name":"require-traverser",
- "version":"0.1.7",
+ "version":"0.1.8",
  "main": "requireTraverser.js",
  "description": "A library for finding all the nested dependencies of a commonJS/node.js module. Uses 'detective' to traverse files.",
  "keywords": ["require", "traverse", "dependency", "modules"],
  "dependencies":{
    "detective":"",
-   "resolve":"",
+   "resolve":"https://github.com/fresheneesz/node-resolve/archive/a5151f0fbeb235e3290d9b84ea706bc72bcec94b.tar.gz",
    "async-future":"0.1.3"
  },
  "devDependencies": {

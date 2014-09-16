@@ -5,7 +5,7 @@ var fs = require('fs')
 var path = require('path')
 var Future = require('async-future')
 
-var resolve = require('resolve')
+var resolve = Future.wrap(require('resolve'))
 var detective = require('detective')
 
 module.exports = function() {
@@ -118,13 +118,12 @@ var traverse = function(dependencies, dependencyMap, opts) {
 // returns Future(<filename>) or Future(undefined)
 function resolveDependencyFileName(directory, dependency, opts) {
 	opts.basedir = directory
-    return Future.wrap(resolve)(dependency, opts)
-				.catch(function(e) {
-					if(e.message.indexOf("Cannot find module") === 0) {
-			            return Future(undefined)
-			        } else {
-						throw e // unknown error
-			        }
-				})
+    return resolve(dependency, opts).catch(function(e) {
+        if(e.message.indexOf("Cannot find module") === 0) {
+            return Future(undefined)
+        } else {
+            throw e // unknown error
+        }
+    })
 
 }

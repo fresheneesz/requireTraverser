@@ -24,7 +24,7 @@ Two ways to call `rt`:
 * multiple modules: `<moduleList>`, [`<opts>`,] `<errback>`
 
 where
-	
+
 * `<directory>` is the directory path from which to search for the module
 * `<module>` is the module to get dependencies from
 * `<moduleList>` is an array of objects like: {dir: <directory>, module: <module>}
@@ -36,14 +36,44 @@ where
 `rt` returns (to the errback) an object like:
 ```
 {<filename>:
-  {resolved: <dependencies>,
+  {resolved: [
+     {relative: <modulePath>, absolute: <absolute filesystem path>},
+     ...
+   ],
    unresolved: <require expressions that couldn't be resolved>,
    unfound: <require dependencies that couldn't be found>
   }
 }
 ```
 
+Example traversed module:
+```
+require("./testModule/")
+var x = "whatever"
+require(x)
+require('dep'+'endency')
+require("http")
+require("url")
+```
+
+Example result:
+```
+{"/home/vagrant/temporaryPackageFolder/node_modules/http-proxy/lib/http-proxy.js":
+    {"resolved":[
+        {"relative":"./testModule/","absolute":"/home/vagrant/temporaryPackageFolder/node_modules/testModule/lib/testModule.js"}
+     ],
+     "unresolved":["'dep'+'endency'", "x"],
+     "unfound":["http","url"]
+    }
+}
+```
+
 `rt` doesn't resolve node.js native libraries (returns them as 'unfound').
+
+Todo
+========
+
+* When node-resolve accepts my pull request, switch back to the main repo
 
 How to Contribute!
 ============
@@ -69,6 +99,7 @@ How to submit pull requests:
 Change Log
 ==========
 
+* 0.1.8 - fixed a bug resolving modules where there is a folder and javascript file with the same name in the same location
 * 0.1.6 - fixed a bug in error handling when initial modules can't be found
 
 License

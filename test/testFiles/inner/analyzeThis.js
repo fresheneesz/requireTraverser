@@ -5,6 +5,11 @@ require('c').hello().goodbye() // methods off it
 var doom = require('doom')(5,6,7); // called as a function
 require("curl")
 
+require('withIndex')
+require('withPackageJson')
+require('./withIndex2/')
+require('./withPackageJson2/')
+
 require("dep"+"endency");	// statement
 
 var x = "test"
