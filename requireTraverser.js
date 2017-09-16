@@ -62,8 +62,12 @@ module.exports = function() {
 // mutates dependencyMap, adding more dependencies
 // returns a future
 var traverse = function(dependencies, dependencyMap, opts) {
-    var mainFutures = []
+    var mainFutures = [];
 	dependencies.forEach(function(dependencyFile) {
+        if (!dependencyFile.endsWith(".js")) {
+            // only traverse js files
+            return;
+        }
         if(dependencyMap[dependencyFile] === undefined) { // only traverse a file if it hasn't already been traversed
             var filePath = path.resolve(dependencyFile)
             var fileDirectory = path.dirname(filePath)
