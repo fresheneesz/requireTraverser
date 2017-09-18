@@ -1,5 +1,3 @@
-**Status**: API finalized, needs testing
-
 requireTraverser
 =============
 
