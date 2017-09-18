@@ -9,7 +9,7 @@
    "async-future":"0.1.3"
  },
  "devDependencies": {
-     "deadunit": "1.0.7"
+     "deadunit": "5.2.1"
  },
  "repository": {
    "type": "git",

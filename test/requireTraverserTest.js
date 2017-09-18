@@ -9,6 +9,11 @@ var futures = []
 var test = Unit.test("Testing requireTraverser", function() {
     var tr = require('../requireTraverser')
 
+
+
+
+    //*
+
     this.test("unfound dependency", function() {
         var t = this
         var f = new Future
@@ -49,6 +54,29 @@ var test = Unit.test("Testing requireTraverser", function() {
             t.log("files" +files)
             f.return()
         });
+    })
+
+    this.test("module with json files", function(t) {
+        this.count(7)
+        tr(__dirname, './testFiles/inner/fileWithJsonRequirements.js', function(e, files) {
+            try {
+                t.eq(e, undefined)
+                // t.log(files)
+
+                var keys = Object.keys(files)
+                t.eq(keys.length, 2)
+
+                var dependencies = files[keys[0]]
+
+                t.eq(dependencies.unfound.length, 0)
+                t.eq(dependencies.unresolved.length, 0)
+                t.eq(dependencies.resolved.length, 2)
+                t.eq(dependencies.resolved[0].relative, './testJson.json')
+                t.eq(dependencies.resolved[1].relative, './dependencyA')
+            } catch(e) {
+                t.ok(false, e)
+            }
+        })
     })
 
     function isFile(filepath, errback) {
@@ -194,6 +222,7 @@ var test = Unit.test("Testing requireTraverser", function() {
         })
     }
 
+    //*/
 })
 
 Future.all(futures).then(function() {
