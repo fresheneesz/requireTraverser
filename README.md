@@ -44,7 +44,7 @@ where
 }
 ```
 
-Example traversed module:
+Example traversed module '/directory/fileName.js':
 ```
 require("./testModule/")
 var x = "whatever"
@@ -54,11 +54,19 @@ require("http")
 require("url")
 ```
 
+Example program in '/directory/':
+```
+var rt = require('require-traverser')
+rt('.', 'fileName.js', function(e, results) {
+   console.dir(results)
+})
+```
+
 Example result:
 ```
-{"/home/vagrant/temporaryPackageFolder/node_modules/http-proxy/lib/http-proxy.js":
+{"/directory/fileName.js":
     {"resolved":[
-        {"relative":"./testModule/","absolute":"/home/vagrant/temporaryPackageFolder/node_modules/testModule/lib/testModule.js"}
+        {"relative":"./testModule/","absolute":"/directory/testModule.js"}
      ],
      "unresolved":["'dep'+'endency'", "x"],
      "unfound":["http","url"]
